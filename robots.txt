@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ev-diagnostika.cz/sitemap.xml
