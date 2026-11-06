@@ -164,6 +164,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-c
 .g-reviews strong{font-size:1.05rem}
 .g-reviews .g-more{color:var(--muted);font-size:.92rem}
 .g-reviews:hover .g-more{color:var(--accent-dark)}
+.g-quotes{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:18px}
+.g-quotes blockquote{margin:0;padding:16px 18px;background:var(--light);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.g-quotes p{margin:0;font-size:.95rem;line-height:1.55}
+.g-quotes footer{font-size:.85rem;color:var(--muted)}
+.g-quotes .g-stars{color:#f5b301;letter-spacing:1px;margin-right:6px}
+@media (max-width:700px){.g-quotes{grid-template-columns:1fr}}
 
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
 .hero-photo{margin:0}
