@@ -53,3 +53,18 @@ if (form) {
     }
   });
 }
+
+// Recenze z Googlu – plynulé automatické posouvání v jednom řádku
+const gq = document.querySelector('.g-quotes');
+const gt = gq && gq.querySelector('.g-track');
+if (gt && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const items = [...gt.children];
+  // zopakovat recenze, aby pás byl delší než šířka stránky
+  while (gt.scrollWidth < gq.clientWidth * 1.2) {
+    items.forEach(el => { const c = el.cloneNode(true); c.setAttribute('aria-hidden', 'true'); gt.appendChild(c); });
+  }
+  // zdvojit celou sadu pro plynulou smyčku
+  [...gt.children].forEach(el => { const c = el.cloneNode(true); c.setAttribute('aria-hidden', 'true'); gt.appendChild(c); });
+  gq.style.setProperty('--g-dur', Math.round(gt.scrollWidth / 2 / 35) + 's'); // ~35 px/s
+  gq.classList.add('is-moving');
+}
