@@ -41,13 +41,14 @@ function buildOrder(form) {
   const out = new FormData();
   ['access_key', 'from_name', 'botcheck'].forEach(k => { if (src.has(k)) out.append(k, src.get(k)); });
   const v = k => (src.get(k) || '').toString().trim();
-  let termin = v('Termín');
-  const m = termin.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (m) termin = `${+m[3]}. ${+m[2]}. ${m[1]}`;
-  const sluzba = v('Služba').replace(/\s*\(.*\)$/, '');
-  out.append('subject', `Poptávka: ${v('Vůz') || 'vůz neuveden'} – ${sluzba}${termin ? ' – ' + termin : ''}`);
-  const fields = [['Služba', v('Služba')], ['Termín', termin], ['Místo testu', v('Místo testu')], ['Vůz', v('Vůz')], ['Rok výroby', v('Rok výroby')],
-    ['Jméno', v('Jméno')], ['Telefon', v('Telefon')], ['email', v('email')], ['Inzerát', v('Inzerát')], ['Zpráva', v('Zpráva')]];
+  let date = v('date');
+  const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) date = `${+m[3]}. ${+m[2]}. ${m[1]}`;
+  const service = v('service').replace(/\s*\(.*\)$/, '');
+  const prefix = document.documentElement.lang === 'en' ? 'Inquiry (EN)' : 'Poptávka';
+  out.append('subject', `${prefix}: ${v('car') || '?'} – ${service}${date ? ' – ' + date : ''}`);
+  const fields = [['Service', v('service')], ['Date', date], ['Location', v('location')], ['Car', v('car')], ['Year', v('year')],
+    ['Name', v('name')], ['Phone', v('phone')], ['email', v('email')], ['Listing', v('listing')], ['Message', v('message')]];
   fields.forEach(([k, val]) => { if (val) out.append(k, val); });
   return out;
 }
@@ -58,11 +59,11 @@ function showThanks(form) {
   if (!dlg || typeof dlg.showModal !== 'function') return;
   const fd = new FormData(form);
   const v = k => (fd.get(k) || '').toString().trim();
-  const sluzba = v('Služba').replace(/\s*\(.*\)$/, '');
-  let termin = v('Termín');
-  const m = termin.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (m) termin = `${+m[3]}. ${+m[2]}. ${m[1]}`;
-  document.getElementById('thanks-summary').textContent = [sluzba, v('Vůz'), termin].filter(Boolean).join(' · ');
+  const service = v('service').replace(/\s*\(.*\)$/, '');
+  let date = v('date');
+  const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) date = `${+m[3]}. ${+m[2]}. ${m[1]}`;
+  document.getElementById('thanks-summary').textContent = [service, v('car'), date].filter(Boolean).join(' · ');
   // mapa jen u testu v Kníničkách
   const map = document.getElementById('thanks-map');
   const sel = document.getElementById('f-package');
