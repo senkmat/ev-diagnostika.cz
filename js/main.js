@@ -52,6 +52,27 @@ function buildOrder(form) {
   return out;
 }
 
+// Okno s poděkováním po úspěšném odeslání
+function showThanks(form) {
+  const dlg = document.getElementById('thanks');
+  if (!dlg || typeof dlg.showModal !== 'function') return;
+  const fd = new FormData(form);
+  const v = k => (fd.get(k) || '').toString().trim();
+  const sluzba = v('Služba').replace(/\s*\(.*\)$/, '');
+  let termin = v('Termín');
+  const m = termin.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) termin = `${+m[3]}. ${+m[2]}. ${m[1]}`;
+  document.getElementById('thanks-summary').textContent = [sluzba, v('Vůz'), termin].filter(Boolean).join(' · ');
+  // mapa jen u testu v Kníničkách
+  const map = document.getElementById('thanks-map');
+  const sel = document.getElementById('f-package');
+  if (map && sel) map.hidden = sel.selectedIndex !== 0;
+  dlg.showModal();
+}
+document.querySelectorAll('.thanks-close').forEach(b => b.addEventListener('click', () => b.closest('dialog').close()));
+const thanksDlg = document.getElementById('thanks');
+if (thanksDlg) thanksDlg.addEventListener('click', e => { if (e.target === thanksDlg) thanksDlg.close(); });
+
 // Odeslání formuláře přes Web3Forms
 const form = document.getElementById('order-form');
 if (form) {
@@ -70,6 +91,7 @@ if (form) {
       });
       const data = await res.json();
       if (data.success) {
+        showThanks(form);
         form.reset();
         updatePlace();
         msg.classList.add('ok');
