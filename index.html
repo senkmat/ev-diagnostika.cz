@@ -322,16 +322,16 @@
       <form id="order-form" action="https://api.web3forms.com/submit" method="POST">
         <input type="hidden" name="access_key" value="e40f4359-14de-4564-9b76-1c5ee3d3490b">
         <input type="hidden" name="subject" value="Nová objednávka – ev-diagnostika.cz">
-        <input type="hidden" name="from_name" value="ev-diagnostika.cz">
+        <input type="hidden" name="from_name" value="Web ev-diagnostika.cz">
         <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
         <div class="row">
-          <div class="field"><label for="f-name">Jméno a příjmení</label><input id="f-name" name="jmeno" required autocomplete="name"></div>
-          <div class="field"><label for="f-phone">Telefon</label><input id="f-phone" name="telefon" type="tel" required autocomplete="tel"></div>
+          <div class="field"><label for="f-name">Jméno a příjmení</label><input id="f-name" name="Jméno" required autocomplete="name"></div>
+          <div class="field"><label for="f-phone">Telefon</label><input id="f-phone" name="Telefon" type="tel" required autocomplete="tel"></div>
         </div>
         <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
         <div class="field">
           <label for="f-package">Služba</label>
-          <select id="f-package" name="sluzba" required>
+          <select id="f-package" name="Služba" required>
             <option value="Test v Kníničkách (2 490 Kč)">Test baterie v Kníničkách – 2 490 Kč</option>
             <option value="Test u zákazníka / u prodejce (2 790 Kč)">Test u vás nebo u prodejce – 2 790 Kč</option>
             <option value="Prověrka ojeté Tesly (3 990 Kč)">Prověrka ojeté Tesly – 3 990 Kč</option>
@@ -339,15 +339,15 @@
           </select>
         </div>
         <div class="row">
-          <div class="field"><label for="f-car">Vůz (značka a model)</label><input id="f-car" name="vuz" required placeholder="např. Tesla Model 3 LR"></div>
-          <div class="field"><label for="f-year">Rok výroby</label><input id="f-year" name="rok_vyroby" inputmode="numeric" placeholder="např. 2021"></div>
+          <div class="field"><label for="f-car">Vůz (značka a model)</label><input id="f-car" name="Vůz" required placeholder="např. Tesla Model 3 LR"></div>
+          <div class="field"><label for="f-year">Rok výroby</label><input id="f-year" name="Rok výroby" inputmode="numeric" placeholder="např. 2021"></div>
         </div>
         <div class="row">
-          <div class="field"><label for="f-date">Preferovaný termín</label><input id="f-date" name="termin" type="date"></div>
-          <div class="field" id="place-field" hidden><label for="f-place">Místo testu</label><input id="f-place" name="misto" placeholder="adresa nebo obec" disabled></div>
+          <div class="field"><label for="f-date">Preferovaný termín</label><input id="f-date" name="Termín" type="date"></div>
+          <div class="field" id="place-field" hidden><label for="f-place">Místo testu</label><input id="f-place" name="Místo testu" placeholder="adresa nebo obec" disabled></div>
         </div>
-        <div class="field"><label for="f-link">Odkaz na inzerát (nepovinné)</label><input id="f-link" name="inzerat" type="url" placeholder="https://"></div>
-        <div class="field"><label for="f-msg">Zpráva</label><textarea id="f-msg" name="zprava" rows="3" placeholder="Cokoli dalšího, co bych měl vědět"></textarea></div>
+        <div class="field"><label for="f-link">Odkaz na inzerát (nepovinné)</label><input id="f-link" name="Inzerát" type="url" placeholder="https://"></div>
+        <div class="field"><label for="f-msg">Zpráva</label><textarea id="f-msg" name="Zpráva" rows="3" placeholder="Cokoli dalšího, co bych měl vědět"></textarea></div>
         <p class="consent">Odesláním souhlasíte se zpracováním údajů za účelem vyřízení objednávky. Více v <a href="ochrana-osobnich-udaju/">zásadách ochrany osobních údajů</a>.</p>
         <button type="submit" class="btn btn-primary">Odeslat objednávku</button>
         <p class="form-msg" id="form-msg" role="status"></p>
@@ -381,7 +381,7 @@
   </div>
 </footer>
 <a href="tel:+420721256963" class="call-fab" aria-label="Zavolat">📞 Zavolat</a>
-<script src="js/main.js?v=4cf79134" defer></script>
+<script src="js/main.js?v=5bc4d1ba" defer></script>
 
 </body>
 </html>

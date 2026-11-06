@@ -35,6 +35,23 @@ function updatePlace() {
 const pkg = document.getElementById('f-package');
 if (pkg) { pkg.addEventListener('change', updatePlace); updatePlace(); }
 
+// Přehledný e-mail s objednávkou: důležité údaje nahoře, prázdná pole pryč, český datum, předmět s autem a službou
+function buildOrder(form) {
+  const src = new FormData(form);
+  const out = new FormData();
+  ['access_key', 'from_name', 'botcheck'].forEach(k => { if (src.has(k)) out.append(k, src.get(k)); });
+  const v = k => (src.get(k) || '').toString().trim();
+  let termin = v('Termín');
+  const m = termin.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (m) termin = `${+m[3]}. ${+m[2]}. ${m[1]}`;
+  const sluzba = v('Služba').replace(/\s*\(.*\)$/, '');
+  out.append('subject', `Poptávka: ${v('Vůz') || 'vůz neuveden'} – ${sluzba}${termin ? ' – ' + termin : ''}`);
+  const fields = [['Služba', v('Služba')], ['Termín', termin], ['Místo testu', v('Místo testu')], ['Vůz', v('Vůz')], ['Rok výroby', v('Rok výroby')],
+    ['Jméno', v('Jméno')], ['Telefon', v('Telefon')], ['email', v('email')], ['Inzerát', v('Inzerát')], ['Zpráva', v('Zpráva')]];
+  fields.forEach(([k, val]) => { if (val) out.append(k, val); });
+  return out;
+}
+
 // Odeslání formuláře přes Web3Forms
 const form = document.getElementById('order-form');
 if (form) {
@@ -49,14 +66,14 @@ if (form) {
       const res = await fetch(form.action, {
         method: 'POST',
         headers: { 'Accept': 'application/json' },
-        body: new FormData(form)
+        body: buildOrder(form)
       });
       const data = await res.json();
       if (data.success) {
         form.reset();
         updatePlace();
         msg.classList.add('ok');
-        msg.textContent = 'Díky! Objednávka dorazila, do 24 hodin se vám ozveme.';
+        msg.textContent = 'Díky! Poptávka dorazila. Ozvu se vám co nejdřív, nejpozději do 24 hodin, a domluvíme termín.';
       } else {
         throw new Error(data.message || 'Chyba');
       }
