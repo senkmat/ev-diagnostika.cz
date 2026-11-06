@@ -193,3 +193,10 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-c
 @media (max-width:900px){.hero-bg{background:
   linear-gradient(180deg,rgba(11,18,32,.82) 0%,rgba(11,18,32,.9) 60%,rgba(11,18,32,.97) 100%),
   url(../img/test-v-aute.jpg) 70% center/cover no-repeat,var(--bg);padding:72px 0 64px}}
+
+/* bitcoin */
+.btc-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 8px;border-radius:999px;background:#fff7ec;border:1px solid #f7c98a;color:#8a4b00;font-weight:700;font-size:.95rem;vertical-align:middle}
+.btc-badge img{display:block}
+.btc-note{color:var(--muted);font-size:.9rem;margin-left:6px}
+.btc-inline{vertical-align:-3px;margin-left:4px}
+.btc-foot{display:inline-flex;align-items:center;gap:6px;margin-top:6px}
