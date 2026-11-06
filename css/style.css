@@ -159,7 +159,11 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-c
   .nav .btn-sm{align-self:stretch;text-align:center}
 }
 
-.g-rating{color:var(--text);text-decoration:none}.g-rating:hover{color:var(--accent-dark)}
+.g-reviews{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 12px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line);color:var(--text);text-decoration:none;text-align:center}
+.g-reviews .g-stars{color:#f5b301;font-size:1.2rem;letter-spacing:2px}
+.g-reviews strong{font-size:1.05rem}
+.g-reviews .g-more{color:var(--muted);font-size:.92rem}
+.g-reviews:hover .g-more{color:var(--accent-dark)}
 
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
 .hero-photo{margin:0}
