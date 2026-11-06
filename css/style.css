@@ -220,3 +220,4 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-c
 .thanks-icon{width:56px;height:56px;margin:0 auto;border-radius:50%;background:var(--accent);color:#06291a;font-size:1.8rem;font-weight:800;display:flex;align-items:center;justify-content:center}
 .thanks-links{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0 18px}
 .thanks-close{width:100%}
+.nav .lang-switch{font-weight:700;border:1px solid #3a4560;border-radius:6px;padding:2px 8px;font-size:.85rem}

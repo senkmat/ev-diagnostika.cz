@@ -1,3 +1,6 @@
+// Jazyk stránky (cs / en)
+const EN = document.documentElement.lang === 'en';
+
 // Mobilní menu
 const toggle = document.querySelector('.nav-toggle');
 const nav = document.querySelector('.nav');
@@ -45,7 +48,7 @@ function buildOrder(form) {
   const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m) date = `${+m[3]}. ${+m[2]}. ${m[1]}`;
   const service = v('service').replace(/\s*\(.*\)$/, '');
-  const prefix = document.documentElement.lang === 'en' ? 'Inquiry (EN)' : 'Poptávka';
+  const prefix = EN ? 'Poptávka (EN)' : 'Poptávka';
   out.append('subject', `${prefix}: ${v('car') || '?'} – ${service}${date ? ' – ' + date : ''}`);
   const fields = [['Service', v('service')], ['Date', date], ['Location', v('location')], ['Car', v('car')], ['Year', v('year')],
     ['Name', v('name')], ['Phone', v('phone')], ['email', v('email')], ['Listing', v('listing')], ['Message', v('message')]];
@@ -59,10 +62,11 @@ function showThanks(form) {
   if (!dlg || typeof dlg.showModal !== 'function') return;
   const fd = new FormData(form);
   const v = k => (fd.get(k) || '').toString().trim();
-  const service = v('service').replace(/\s*\(.*\)$/, '');
+  const selEl = document.getElementById('f-package');
+  const service = selEl ? selEl.options[selEl.selectedIndex].text.replace(/\s+–\s+[\d ,.]+\s*(Kč|CZK)$/, '') : '';
   let date = v('date');
   const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (m) date = `${+m[3]}. ${+m[2]}. ${m[1]}`;
+  if (m) date = EN ? `${+m[3]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]} ${m[1]}` : `${+m[3]}. ${+m[2]}. ${m[1]}`;
   document.getElementById('thanks-summary').textContent = [service, v('car'), date].filter(Boolean).join(' · ');
   // mapa jen u testu v Kníničkách
   const map = document.getElementById('thanks-map');
@@ -83,7 +87,7 @@ if (form) {
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true;
     msg.className = 'form-msg';
-    msg.textContent = 'Odesílám…';
+    msg.textContent = EN ? 'Sending…' : 'Odesílám…';
     try {
       const res = await fetch(form.action, {
         method: 'POST',
@@ -96,13 +100,13 @@ if (form) {
         form.reset();
         updatePlace();
         msg.classList.add('ok');
-        msg.textContent = 'Díky! Poptávka dorazila. Ozvu se vám co nejdřív, nejpozději do 24 hodin, a domluvíme termín.';
+        msg.textContent = EN ? 'Thank you! Your request has arrived. I will get back to you within 24 hours at the latest.' : 'Díky! Poptávka dorazila. Ozvu se vám co nejdřív, nejpozději do 24 hodin, a domluvíme termín.';
       } else {
         throw new Error(data.message || 'Chyba');
       }
     } catch (err) {
       msg.classList.add('err');
-      msg.innerHTML = 'Odeslání se nepovedlo. Zavolejte prosím na <a href="tel:+420721256963">+420 721 256 963</a> nebo napište na <a href="mailto:evdiagnostika@gmail.com">evdiagnostika@gmail.com</a>.';
+      msg.innerHTML = EN ? 'Sending failed. Please call <a href="tel:+420721256963">+420 721 256 963</a> or email <a href="mailto:evdiagnostika@gmail.com">evdiagnostika@gmail.com</a>.' : 'Odeslání se nepovedlo. Zavolejte prosím na <a href="tel:+420721256963">+420 721 256 963</a> nebo napište na <a href="mailto:evdiagnostika@gmail.com">evdiagnostika@gmail.com</a>.';
     } finally {
       btn.disabled = false;
     }
@@ -128,7 +132,7 @@ if (gt && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
 document.querySelectorAll('.map-load').forEach(function(btn){
   btn.addEventListener('click',function(){
     var box=btn.parentElement, f=document.createElement('iframe');
-    f.src=box.getAttribute('data-src'); f.title='Mapa – U Památníku 18, Brno-Kníničky'; f.loading='lazy'; f.referrerPolicy='no-referrer-when-downgrade';
+    f.src=box.getAttribute('data-src'); f.title=(EN?'Map':'Mapa')+' – U Památníku 18, Brno-Kníničky'; f.loading='lazy'; f.referrerPolicy='no-referrer-when-downgrade';
     box.innerHTML=''; box.appendChild(f);
   });
 });
