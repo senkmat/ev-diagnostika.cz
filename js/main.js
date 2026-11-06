@@ -68,3 +68,12 @@ if (gt && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
   gq.style.setProperty('--g-dur', Math.round(gt.scrollWidth / 2 / 35) + 's'); // ~35 px/s
   gq.classList.add('is-moving');
 }
+
+// mapa se načte až po kliknutí (bez cookies Google předem)
+document.querySelectorAll('.map-load').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var box=btn.parentElement, f=document.createElement('iframe');
+    f.src=box.getAttribute('data-src'); f.title='Mapa – U Památníku 18, Brno-Kníničky'; f.loading='lazy'; f.referrerPolicy='no-referrer-when-downgrade';
+    box.innerHTML=''; box.appendChild(f);
+  });
+});
