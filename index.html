@@ -339,12 +339,12 @@
           </select>
         </div>
         <div class="row">
-          <div class="field"><label for="f-car">Vůz (značka a model)</label><input id="f-car" name="vuz" required placeholder="např. Škoda Enyaq 80"></div>
+          <div class="field"><label for="f-car">Vůz (značka a model)</label><input id="f-car" name="vuz" required placeholder="např. Tesla Model 3 LR"></div>
           <div class="field"><label for="f-year">Rok výroby</label><input id="f-year" name="rok_vyroby" inputmode="numeric" placeholder="např. 2021"></div>
         </div>
         <div class="row">
           <div class="field"><label for="f-date">Preferovaný termín</label><input id="f-date" name="termin" type="date"></div>
-          <div class="field"><label for="f-place">Místo testu</label><input id="f-place" name="misto" placeholder="adresa / obec"></div>
+          <div class="field" id="place-field" hidden><label for="f-place">Místo testu</label><input id="f-place" name="misto" placeholder="adresa nebo obec" disabled></div>
         </div>
         <div class="field"><label for="f-link">Odkaz na inzerát (nepovinné)</label><input id="f-link" name="inzerat" type="url" placeholder="https://"></div>
         <div class="field"><label for="f-msg">Zpráva</label><textarea id="f-msg" name="zprava" rows="3" placeholder="Cokoli dalšího, co bych měl vědět"></textarea></div>
@@ -381,7 +381,7 @@
   </div>
 </footer>
 <a href="tel:+420721256963" class="call-fab" aria-label="Zavolat">📞 Zavolat</a>
-<script src="js/main.js?v=79ae7ed0" defer></script>
+<script src="js/main.js?v=4cf79134" defer></script>
 
 </body>
 </html>

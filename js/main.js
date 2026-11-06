@@ -17,9 +17,23 @@ if (y) y.textContent = new Date().getFullYear();
 document.querySelectorAll('[data-package]').forEach(btn => {
   btn.addEventListener('click', () => {
     const sel = document.getElementById('f-package');
-    if (sel) sel.selectedIndex = parseInt(btn.dataset.package, 10) || 0;
+    if (sel) { sel.selectedIndex = parseInt(btn.dataset.package, 10) || 0; updatePlace(); }
   });
 });
+
+// Místo testu jen když nejde o test v Kníničkách (první volba)
+function updatePlace() {
+  const sel = document.getElementById('f-package');
+  const field = document.getElementById('place-field');
+  const input = document.getElementById('f-place');
+  if (!sel || !field || !input) return;
+  const show = sel.selectedIndex !== 0;
+  field.hidden = !show;
+  input.disabled = !show;
+  input.required = show;
+}
+const pkg = document.getElementById('f-package');
+if (pkg) { pkg.addEventListener('change', updatePlace); updatePlace(); }
 
 // Odeslání formuláře přes Web3Forms
 const form = document.getElementById('order-form');
@@ -40,6 +54,7 @@ if (form) {
       const data = await res.json();
       if (data.success) {
         form.reset();
+        updatePlace();
         msg.classList.add('ok');
         msg.textContent = 'Díky! Objednávka dorazila, do 24 hodin se vám ozveme.';
       } else {
