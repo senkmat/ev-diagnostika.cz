@@ -97,6 +97,7 @@ if (form) {
       const data = await res.json();
       if (data.success) {
         showThanks(form);
+        adsConversion(ADS.form, 2490);
         form.reset();
         updatePlace();
         msg.classList.add('ok');
@@ -136,3 +137,69 @@ document.querySelectorAll('.map-load').forEach(function(btn){
     box.innerHTML=''; box.appendChild(f);
   });
 });
+
+// Měření Google Ads – jen se souhlasem. Lišta se ukáže pouze návštěvníkům, kteří přišli z reklamy (gclid v adrese).
+const ADS = { id: 'AW-18566439737', form: 'qugTCL70oLYdELnGlZVF', call: '', key: 'ads-consent' }; // call: štítek konverze „klik na telefon“ – doplnit, až bude v Google Ads založená
+window.dataLayer = window.dataLayer || [];
+function gtag() { dataLayer.push(arguments); }
+let adsOn = false;
+function adsGet() { try { return localStorage.getItem(ADS.key); } catch (e) { return null; } }
+function adsSet(v) { try { localStorage.setItem(ADS.key, v); } catch (e) {} }
+function adsStart() {
+  if (adsOn) return;
+  adsOn = true;
+  gtag('consent', 'default', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'denied', analytics_storage: 'denied' });
+  gtag('js', new Date());
+  gtag('config', ADS.id);
+  const s = document.createElement('script');
+  s.async = true;
+  s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ADS.id;
+  document.head.appendChild(s);
+}
+function adsConversion(label, value) {
+  if (!adsOn || !label) return;
+  const p = { send_to: ADS.id + '/' + label, transaction_id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8) };
+  if (value) { p.value = value; p.currency = 'CZK'; }
+  gtag('event', 'conversion', p);
+}
+function adsBar() {
+  if (document.querySelector('.ads-bar')) return;
+  const bar = document.createElement('div');
+  bar.className = 'ads-bar';
+  bar.setAttribute('role', 'region');
+  bar.setAttribute('aria-label', EN ? 'Ad measurement consent' : 'Souhlas s měřením reklamy');
+  const privacy = '/ochrana-osobnich-udaju/#cookies';
+  bar.innerHTML = EN
+    ? '<p>You came here from a Google ad. May I measure whether the ad led to an enquiry? It uses a Google cookie. <a href="' + privacy + '">Details</a></p><div class="ads-bar-btns"><button type="button" class="btn btn-primary" data-ads="granted">Allow</button><button type="button" class="btn ads-bar-no" data-ads="denied">Decline</button></div>'
+    : '<p>Přišli jste z reklamy na Googlu. Můžu změřit, jestli reklama vedla k poptávce? Použije se k tomu cookie Googlu. <a href="' + privacy + '">Podrobnosti</a></p><div class="ads-bar-btns"><button type="button" class="btn btn-primary" data-ads="granted">Povolit</button><button type="button" class="btn ads-bar-no" data-ads="denied">Odmítnout</button></div>';
+  bar.querySelectorAll('[data-ads]').forEach(b => b.addEventListener('click', () => {
+    adsSet(b.dataset.ads);
+    if (b.dataset.ads === 'granted') adsStart();
+    bar.remove();
+  }));
+  document.body.appendChild(bar);
+}
+const adsChoice = adsGet();
+if (adsChoice === 'granted') adsStart();
+else if (!adsChoice && /[?&](gclid|gbraid|wbraid)=/.test(location.search)) adsBar();
+
+// Konverze: klik na telefon
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[href^="tel:"]');
+  if (a) adsConversion(ADS.call);
+});
+
+// Stránka o ochraně údajů: změna souhlasu
+const adsState = document.getElementById('ads-state');
+function adsShowState() {
+  if (!adsState) return;
+  const c = adsGet();
+  adsState.textContent = c === 'granted' ? 'Měření reklamy je teď povolené.' : c === 'denied' ? 'Měření reklamy je teď odmítnuté.' : 'Měření reklamy je teď vypnuté (souhlas jste neudělili).';
+}
+document.querySelectorAll('[data-ads-set]').forEach(b => b.addEventListener('click', () => {
+  adsSet(b.dataset.adsSet);
+  if (b.dataset.adsSet === 'granted') adsStart();
+  else if (adsOn) gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied' });
+  adsShowState();
+}));
+adsShowState();
