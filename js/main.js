@@ -38,23 +38,51 @@ function updatePlace() {
 const pkg = document.getElementById('f-package');
 if (pkg) { pkg.addEventListener('change', updatePlace); updatePlace(); }
 
-// Čas testu: ve všední dny jen od 15:00 – jen upozorní, odeslání neblokuje
+// Čas testu: na mobilu systémový výběr času, na počítači rozbalovací nabídka po půlhodinách
+// (všední dny od 15:00, víkend od 8:00). Na mobilu ve všední den před 15:00 jen upozorní, odeslání neblokuje.
 const fDate = document.getElementById('f-date');
-const fTime = document.getElementById('f-time');
-const fTimeTo = document.getElementById('f-time-to');
+let fTime = document.getElementById('f-time');
+let fTimeTo = document.getElementById('f-time-to');
+const timeLists = !!fTime && matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (timeLists) {
+  [fTime, fTimeTo] = [fTime, fTimeTo].map(inp => {
+    const sel = document.createElement('select');
+    sel.id = inp.id; sel.name = inp.name;
+    sel.setAttribute('aria-label', inp.getAttribute('aria-label'));
+    inp.replaceWith(sel);
+    return sel;
+  });
+}
+if (fDate) fDate.addEventListener('click', () => { try { fDate.showPicker(); } catch (e) {} });
+const hhmm = min => String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0');
+function fillTimes(sel, from, to, label) {
+  const keep = sel.value;
+  const opts = [new Option(label, '')];
+  for (let t = from; t <= to; t += 30) opts.push(new Option(hhmm(t), hhmm(t)));
+  sel.replaceChildren(...opts);
+  sel.value = opts.some(o => o.value === keep) ? keep : '';
+}
 function orderTime() {
   const a = fTime ? fTime.value : '', b = fTimeTo ? fTimeTo.value : '';
   return a && b ? a + '–' + b : a ? (EN ? 'from ' : 'od ') + a : b ? (EN ? 'until ' : 'do ') + b : '';
 }
 function updateTimes() {
-  const warn = document.getElementById('time-warn');
-  if (!warn || !fTime) return;
+  if (!fTime) return;
   const m = (fDate && fDate.value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
   const day = m ? new Date(+m[1], +m[2] - 1, +m[3]).getDay() : -1;
+  const weekday = day >= 1 && day <= 5;
+  if (timeLists) {
+    const start = weekday ? 15 * 60 : 8 * 60;
+    fillTimes(fTime, start, 21 * 60, EN ? 'from' : 'od');
+    const a = fTime.value ? +fTime.value.slice(0, 2) * 60 + +fTime.value.slice(3) : start;
+    fillTimes(fTimeTo, a + 30, 22 * 60, EN ? 'to' : 'do');
+  }
+  const warn = document.getElementById('time-warn');
   const t = fTime.value || (fTimeTo && fTimeTo.value) || '';
-  warn.hidden = !(day >= 1 && day <= 5 && t && t < '15:00');
+  if (warn) warn.hidden = !(weekday && t && t < '15:00');
 }
 [fDate, fTime, fTimeTo].forEach(el => { if (el) el.addEventListener('change', updateTimes); });
+updateTimes();
 
 // Přehledný e-mail s objednávkou: důležité údaje nahoře, prázdná pole pryč, český datum, předmět s autem a službou
 function buildOrder(form) {
