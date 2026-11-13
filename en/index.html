@@ -17,7 +17,7 @@
 <link rel="icon" href="../favicon.svg?v=2" type="image/svg+xml">
 <link rel="icon" href="../favicon-32.png?v=2" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=2">
-<link rel="stylesheet" href="../css/style.css?v=dae5caef">
+<link rel="stylesheet" href="../css/style.css?v=ddec968a">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -348,8 +348,13 @@
         </div>
         <div class="row">
           <div class="field"><label for="f-date">Preferred date</label><input id="f-date" name="date" type="date"></div>
-          <div class="field" id="place-field" hidden><label for="f-place">Test location</label><input id="f-place" name="location" placeholder="address or town" disabled></div>
+          <div class="field"><label for="f-time">Time (optional)</label>
+            <div class="time-range"><input id="f-time" name="time_from" type="time" step="900" aria-label="Time from"><span aria-hidden="true">–</span><input id="f-time-to" name="time_to" type="time" step="900" aria-label="Time to"></div>
+          </div>
         </div>
+        <p class="field-note">On weekdays I test from 3 pm, at weekends any time. Pick a start time or a range. I will confirm the exact time.</p>
+        <p class="field-note field-warn" id="time-warn" hidden>On weekdays I am available from 3 pm. Please pick a later time or a weekend.</p>
+        <div class="field" id="place-field" hidden><label for="f-place">Test location</label><input id="f-place" name="location" placeholder="address or town" disabled></div>
         <div class="field"><label for="f-link">Link to the listing (optional)</label><input id="f-link" name="listing" type="url" placeholder="https://"></div>
         <div class="field"><label for="f-msg">Message</label><textarea id="f-msg" name="message" rows="3" placeholder="Anything else I should know"></textarea></div>
         <p class="consent">By submitting you agree to the processing of your data to handle your request. More in the <a href="../ochrana-osobnich-udaju/" hreflang="cs">privacy policy</a> (in Czech).</p>
@@ -397,7 +402,7 @@
   </div>
 </footer>
 <a href="tel:+420721256963" class="call-fab" aria-label="Call">📞 Call</a>
-<script src="../js/main.js?v=499ebac4" defer></script>
+<script src="../js/main.js?v=130cdf40" defer></script>
 
 </body>
 </html>

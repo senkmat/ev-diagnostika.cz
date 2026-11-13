@@ -38,6 +38,24 @@ function updatePlace() {
 const pkg = document.getElementById('f-package');
 if (pkg) { pkg.addEventListener('change', updatePlace); updatePlace(); }
 
+// Čas testu: ve všední dny jen od 15:00 – jen upozorní, odeslání neblokuje
+const fDate = document.getElementById('f-date');
+const fTime = document.getElementById('f-time');
+const fTimeTo = document.getElementById('f-time-to');
+function orderTime() {
+  const a = fTime ? fTime.value : '', b = fTimeTo ? fTimeTo.value : '';
+  return a && b ? a + '–' + b : a ? (EN ? 'from ' : 'od ') + a : b ? (EN ? 'until ' : 'do ') + b : '';
+}
+function updateTimes() {
+  const warn = document.getElementById('time-warn');
+  if (!warn || !fTime) return;
+  const m = (fDate && fDate.value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const day = m ? new Date(+m[1], +m[2] - 1, +m[3]).getDay() : -1;
+  const t = fTime.value || (fTimeTo && fTimeTo.value) || '';
+  warn.hidden = !(day >= 1 && day <= 5 && t && t < '15:00');
+}
+[fDate, fTime, fTimeTo].forEach(el => { if (el) el.addEventListener('change', updateTimes); });
+
 // Přehledný e-mail s objednávkou: důležité údaje nahoře, prázdná pole pryč, český datum, předmět s autem a službou
 function buildOrder(form) {
   const src = new FormData(form);
@@ -48,9 +66,10 @@ function buildOrder(form) {
   const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m) date = `${+m[3]}. ${+m[2]}. ${m[1]}`;
   const service = v('service').replace(/\s*\(.*\)$/, '');
+  const time = orderTime().replace('from ', 'od ').replace('until ', 'do ');
   const prefix = EN ? 'Poptávka (EN)' : 'Poptávka';
-  out.append('subject', `${prefix}: ${v('car') || '?'} – ${service}${date ? ' – ' + date : ''}`);
-  const fields = [['Service', v('service')], ['Date', date], ['Location', v('location')], ['Car', v('car')], ['Year', v('year')],
+  out.append('subject', `${prefix}: ${v('car') || '?'} – ${service}${date ? ' – ' + date : ''}${time ? (date ? ', ' : ' – ') + time : ''}`);
+  const fields = [['Service', v('service')], ['Date', date], ['Time', time], ['Location', v('location')], ['Car', v('car')], ['Year', v('year')],
     ['Name', v('name')], ['Phone', v('phone')], ['email', v('email')], ['Listing', v('listing')], ['Message', v('message')]];
   fields.forEach(([k, val]) => { if (val) out.append(k, val); });
   return out;
@@ -67,7 +86,8 @@ function showThanks(form) {
   let date = v('date');
   const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (m) date = EN ? `${+m[3]} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+m[2]-1]} ${m[1]}` : `${+m[3]}. ${+m[2]}. ${m[1]}`;
-  document.getElementById('thanks-summary').textContent = [service, v('car'), date].filter(Boolean).join(' · ');
+  const time = orderTime();
+  document.getElementById('thanks-summary').textContent = [service, v('car'), [date, time].filter(Boolean).join(', ')].filter(Boolean).join(' · ');
   // mapa jen u testu v Kníničkách
   const map = document.getElementById('thanks-map');
   const sel = document.getElementById('f-package');
@@ -100,6 +120,7 @@ if (form) {
         adsConversion(ADS.form, 2490);
         form.reset();
         updatePlace();
+        updateTimes();
         msg.classList.add('ok');
         msg.textContent = EN ? 'Thank you! Your request has arrived. I will get back to you within 24 hours at the latest.' : 'Díky! Poptávka dorazila. Ozvu se vám co nejdřív, nejpozději do 24 hodin, a domluvíme termín.';
       } else {
