@@ -138,7 +138,7 @@ document.querySelectorAll('.map-load').forEach(function(btn){
   });
 });
 
-// Měření Google Ads – jen se souhlasem. Lišta se ukáže pouze návštěvníkům, kteří přišli z reklamy (gclid v adrese).
+// Měření Google Ads – načítá se všem návštěvníkům bez lišty. Vypnout jde na stránce o ochraně údajů (volba se pamatuje v localStorage).
 const ADS = { id: 'AW-18566439737', form: 'qugTCL70oLYdELnGlZVF', call: '', key: 'ads-consent' }; // call: štítek konverze „klik na telefon“ – doplnit, až bude v Google Ads založená
 window.dataLayer = window.dataLayer || [];
 function gtag() { dataLayer.push(arguments); }
@@ -162,26 +162,7 @@ function adsConversion(label, value) {
   if (value) { p.value = value; p.currency = 'CZK'; }
   gtag('event', 'conversion', p);
 }
-function adsBar() {
-  if (document.querySelector('.ads-bar')) return;
-  const bar = document.createElement('div');
-  bar.className = 'ads-bar';
-  bar.setAttribute('role', 'region');
-  bar.setAttribute('aria-label', EN ? 'Ad measurement consent' : 'Souhlas s měřením reklamy');
-  const privacy = '/ochrana-osobnich-udaju/#cookies';
-  bar.innerHTML = EN
-    ? '<p>You came here from a Google ad. May I measure whether the ad led to an enquiry? It uses a Google cookie. <a href="' + privacy + '">Details</a></p><div class="ads-bar-btns"><button type="button" class="btn btn-primary" data-ads="granted">Allow</button><button type="button" class="btn ads-bar-no" data-ads="denied">Decline</button></div>'
-    : '<p>Přišli jste z reklamy na Googlu. Můžu změřit, jestli reklama vedla k poptávce? Použije se k tomu cookie Googlu. <a href="' + privacy + '">Podrobnosti</a></p><div class="ads-bar-btns"><button type="button" class="btn btn-primary" data-ads="granted">Povolit</button><button type="button" class="btn ads-bar-no" data-ads="denied">Odmítnout</button></div>';
-  bar.querySelectorAll('[data-ads]').forEach(b => b.addEventListener('click', () => {
-    adsSet(b.dataset.ads);
-    if (b.dataset.ads === 'granted') adsStart();
-    bar.remove();
-  }));
-  document.body.appendChild(bar);
-}
-const adsChoice = adsGet();
-if (adsChoice === 'granted') adsStart();
-else if (!adsChoice && /[?&](gclid|gbraid|wbraid)=/.test(location.search)) adsBar();
+if (adsGet() !== 'denied') adsStart();
 
 // Konverze: klik na telefon
 document.addEventListener('click', e => {
@@ -193,13 +174,15 @@ document.addEventListener('click', e => {
 const adsState = document.getElementById('ads-state');
 function adsShowState() {
   if (!adsState) return;
-  const c = adsGet();
-  adsState.textContent = c === 'granted' ? 'Měření reklamy je teď povolené.' : c === 'denied' ? 'Měření reklamy je teď odmítnuté.' : 'Měření reklamy je teď vypnuté (souhlas jste neudělili).';
+  adsState.textContent = adsGet() === 'denied' ? 'Měření reklamy je teď vypnuté.' : 'Měření reklamy je teď zapnuté.';
 }
 document.querySelectorAll('[data-ads-set]').forEach(b => b.addEventListener('click', () => {
   adsSet(b.dataset.adsSet);
   if (b.dataset.adsSet === 'granted') adsStart();
-  else if (adsOn) gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied' });
+  else {
+    if (adsOn) gtag('consent', 'update', { ad_storage: 'denied', ad_user_data: 'denied' });
+    ['_gcl_aw', '_gcl_au', '_gcl_gs', '_gcl_gb'].forEach(n => ['', '; domain=.' + location.hostname.replace(/^www\./, '')].forEach(d => { document.cookie = n + '=; Max-Age=0; path=/' + d; }));
+  }
   adsShowState();
 }));
 adsShowState();
