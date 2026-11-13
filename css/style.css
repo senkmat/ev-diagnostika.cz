@@ -111,7 +111,18 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);border-c
 .field{margin-bottom:16px}
 form .field-note{margin:-6px 0 20px;font-size:.88rem;color:var(--muted)}
 form .field-warn{margin-top:-12px;color:#b45309;font-weight:600}
-.time-range{display:flex;align-items:center;gap:8px}
+.time-range{display:flex;align-items:center;gap:8px;position:relative}
+.time-btn{cursor:pointer;text-align:center}
+.time-pop{position:absolute;top:calc(100% + 8px);left:0;z-index:40;width:230px;padding:12px;background:#fff;border:1px solid #cfd5e1;border-radius:14px;box-shadow:0 14px 36px rgba(15,23,42,.2)}
+.time-pop-right{left:auto;right:0}
+.time-cols{display:flex;gap:8px}
+.time-col{flex:1;max-height:212px;overflow-y:auto;display:flex;flex-direction:column;gap:2px;position:relative}
+.time-col button{border:0;background:none;padding:8px 0;border-radius:8px;font:inherit;font-size:1.05rem;color:var(--text);cursor:pointer}
+.time-col button:hover{background:#f1f3f8}
+.time-col button.on{background:#F7931A;color:#111;font-weight:700}
+.time-foot{display:flex;justify-content:space-between;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid #e6e9f0}
+.time-foot button{border:1px solid #cfd5e1;background:#fff;border-radius:999px;padding:7px 16px;font:inherit;font-size:.92rem;color:var(--text);cursor:pointer}
+.time-foot .time-ok{background:#F7931A;border-color:#F7931A;color:#111;font-weight:700}
 .time-range input{min-width:0;flex:1}
 .consent{font-size:.88rem;color:var(--muted)}
 .form-msg{margin-top:14px;font-weight:600}

@@ -38,29 +38,29 @@ function updatePlace() {
 const pkg = document.getElementById('f-package');
 if (pkg) { pkg.addEventListener('change', updatePlace); updatePlace(); }
 
-// Čas testu: na mobilu systémový výběr času, na počítači rozbalovací nabídka po půlhodinách
-// (všední dny od 15:00, víkend od 8:00). Na mobilu ve všední den před 15:00 jen upozorní, odeslání neblokuje.
+// Čas testu: na mobilu systémový výběr času, na počítači vlastní vyskakovací okno (hodiny + minuty po 15)
+// Všední dny od 15:00, víkend od 8:00. Na mobilu ve všední den před 15:00 jen upozorní, odeslání neblokuje.
 const fDate = document.getElementById('f-date');
 let fTime = document.getElementById('f-time');
 let fTimeTo = document.getElementById('f-time-to');
-const timeLists = !!fTime && matchMedia('(hover: hover) and (pointer: fine)').matches;
-if (timeLists) {
-  [fTime, fTimeTo] = [fTime, fTimeTo].map(inp => {
-    const sel = document.createElement('select');
-    sel.id = inp.id; sel.name = inp.name;
-    sel.setAttribute('aria-label', inp.getAttribute('aria-label'));
-    inp.replaceWith(sel);
-    return sel;
+const timePop = !!fTime && matchMedia('(hover: hover) and (pointer: fine)').matches;
+if (timePop) {
+  [fTime, fTimeTo] = [fTime, fTimeTo].map((inp, i) => {
+    const t = document.createElement('input');
+    t.type = 'text'; t.readOnly = true; t.className = 'time-btn';
+    t.id = inp.id; t.name = inp.name;
+    t.placeholder = EN ? ['from', 'to'][i] : ['od', 'do'][i];
+    t.setAttribute('aria-label', inp.getAttribute('aria-label'));
+    t.setAttribute('aria-haspopup', 'dialog');
+    inp.replaceWith(t);
+    return t;
   });
 }
 if (fDate) fDate.addEventListener('click', () => { try { fDate.showPicker(); } catch (e) {} });
-const hhmm = min => String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0');
-function fillTimes(sel, from, to, label) {
-  const keep = sel.value;
-  const opts = [new Option(label, '')];
-  for (let t = from; t <= to; t += 30) opts.push(new Option(hhmm(t), hhmm(t)));
-  sel.replaceChildren(...opts);
-  sel.value = opts.some(o => o.value === keep) ? keep : '';
+function isWeekday() {
+  const m = (fDate && fDate.value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const day = m ? new Date(+m[1], +m[2] - 1, +m[3]).getDay() : -1;
+  return day >= 1 && day <= 5;
 }
 function orderTime() {
   const a = fTime ? fTime.value : '', b = fTimeTo ? fTimeTo.value : '';
@@ -68,21 +68,67 @@ function orderTime() {
 }
 function updateTimes() {
   if (!fTime) return;
-  const m = (fDate && fDate.value || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  const day = m ? new Date(+m[1], +m[2] - 1, +m[3]).getDay() : -1;
-  const weekday = day >= 1 && day <= 5;
-  if (timeLists) {
-    const start = weekday ? 15 * 60 : 8 * 60;
-    fillTimes(fTime, start, 21 * 60, EN ? 'from' : 'od');
-    const a = fTime.value ? +fTime.value.slice(0, 2) * 60 + +fTime.value.slice(3) : start;
-    fillTimes(fTimeTo, a + 30, 22 * 60, EN ? 'to' : 'do');
+  const weekday = isWeekday();
+  if (timePop) {
+    [fTime, fTimeTo].forEach(f => { if (weekday && f.value && f.value < '15:00') f.value = ''; });
+    if (fTime.value && fTimeTo.value && fTimeTo.value <= fTime.value) fTimeTo.value = '';
   }
   const warn = document.getElementById('time-warn');
   const t = fTime.value || (fTimeTo && fTimeTo.value) || '';
   if (warn) warn.hidden = !(weekday && t && t < '15:00');
 }
 [fDate, fTime, fTimeTo].forEach(el => { if (el) el.addEventListener('change', updateTimes); });
-updateTimes();
+
+let pop = null, popField = null;
+function closeTimePop() { if (pop) { pop.remove(); pop = null; popField = null; } }
+function openTimePop(field) {
+  if (popField === field) return;
+  closeTimePop();
+  const isTo = field === fTimeTo;
+  let h0 = isWeekday() ? 15 : 8;
+  if (isTo && fTime.value) h0 = Math.max(h0, +fTime.value.slice(0, 2));
+  const h1 = isTo ? 22 : 21;
+  let [h, m] = field.value ? field.value.split(':') : ['', '00'];
+  pop = document.createElement('div'); popField = field;
+  pop.className = 'time-pop' + (isTo ? ' time-pop-right' : '');
+  pop.setAttribute('role', 'dialog');
+  pop.setAttribute('aria-label', field.getAttribute('aria-label'));
+  const col = (vals, cur, pick) => {
+    const c = document.createElement('div'); c.className = 'time-col';
+    vals.forEach(v => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = v;
+      if (v === cur) b.className = 'on';
+      b.addEventListener('click', () => { pick(v); c.querySelectorAll('.on').forEach(x => x.classList.remove('on')); b.classList.add('on'); });
+      c.appendChild(b);
+    });
+    return c;
+  };
+  const set = () => { if (h !== '') { field.value = h + ':' + m; updateTimes(); } };
+  const hours = []; for (let x = h0; x <= h1; x++) hours.push(String(x).padStart(2, '0'));
+  const cols = document.createElement('div'); cols.className = 'time-cols';
+  const hc = col(hours, h, v => { h = v; set(); });
+  const mc = col(['00', '15', '30', '45'], field.value ? m : '', v => { m = v; if (h === '') { h = hours[0]; hc.firstChild.classList.add('on'); } set(); });
+  cols.append(hc, mc);
+  const foot = document.createElement('div'); foot.className = 'time-foot';
+  const clr = document.createElement('button'); clr.type = 'button'; clr.className = 'time-clear'; clr.textContent = EN ? 'Clear' : 'Smazat';
+  clr.addEventListener('click', () => { field.value = ''; updateTimes(); closeTimePop(); });
+  const ok = document.createElement('button'); ok.type = 'button'; ok.className = 'time-ok'; ok.textContent = EN ? 'Done' : 'Hotovo';
+  ok.addEventListener('click', closeTimePop);
+  foot.append(clr, ok);
+  pop.append(cols, foot);
+  field.parentElement.appendChild(pop);
+  const on = hc.querySelector('.on'); if (on) hc.scrollTop = on.offsetTop - 2 * (on.offsetHeight + 2);
+}
+if (timePop) {
+  [fTime, fTimeTo].forEach(f => {
+    f.addEventListener('click', () => openTimePop(f));
+    f.addEventListener('focus', () => openTimePop(f));
+    f.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTimePop(f); } });
+  });
+  document.addEventListener('mousedown', e => { if (pop && !pop.contains(e.target) && e.target !== popField) closeTimePop(); });
+  document.addEventListener('focusin', e => { if (pop && !pop.contains(e.target) && e.target !== popField) closeTimePop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTimePop(); });
+}
 
 // Přehledný e-mail s objednávkou: důležité údaje nahoře, prázdná pole pryč, český datum, předmět s autem a službou
 function buildOrder(form) {
