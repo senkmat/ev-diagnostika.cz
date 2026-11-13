@@ -87,7 +87,7 @@ function openTimePop(field) {
   const isTo = field === fTimeTo;
   let h0 = isWeekday() ? 15 : 8;
   if (isTo && fTime.value) h0 = Math.max(h0, +fTime.value.slice(0, 2));
-  const h1 = isTo ? 22 : 21;
+  const h1 = 21; // nejpozději 21:45
   let [h, m] = field.value ? field.value.split(':') : ['', '00'];
   pop = document.createElement('div'); popField = field;
   pop.className = 'time-pop' + (isTo ? ' time-pop-right' : '');
